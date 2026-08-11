@@ -1,26 +1,181 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
+
+/* ==========================================================================
+   INFO TRADER — Global CSS Design System
+   Source: StyleGuide.md
+   Rules:
+   - Dark Mode DEFAULT (class="dark" on <html>)
+   - ALL COLORS ARE SOLID — NO GRADIENTS PERMITTED
+   - Font: Inter (UI) + JetBrains Mono (data/numbers/timer)
+   ========================================================================== */
+
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background:           var(--background);
+  --color-foreground:           var(--foreground);
+  --font-sans:                  var(--font-inter);
+  --font-mono:                  var(--font-jetbrains-mono);
+  --font-heading:               var(--font-inter);
+  --color-sidebar-ring:         var(--sidebar-ring);
+  --color-sidebar-border:       var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent:       var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ==========================================================================
+   INFO TRADER — StyleGuide.md Color Tokens (Dark Mode Default)
+   ALL COLORS SOLID — NO GRADIENTS
+   ========================================================================== */
+:root {
+  /* Dark mode IS the default — these are Info Trader palette values */
+  --background:       #090D16;  /* Deep Charcoal Black */
+  --foreground:       #F8FAFC;  /* Pure Off-White */
+  --card:             #121826;  /* Dark Navy Slate */
+  --card-foreground:  #F8FAFC;
+  --popover:          #121826;
+  --popover-foreground: #F8FAFC;
+  --primary:          #10B981;  /* Emerald Green — BUY Signal */
+  --primary-foreground: #090D16;
+  --secondary:        #1F293D;  /* Cool Grey Border */
+  --secondary-foreground: #94A3B8;
+  --muted:            #1F293D;
+  --muted-foreground: #94A3B8;  /* Slate Grey — secondary text */
+  --accent:           #182232;  /* Table header row */
+  --accent-foreground: #94A3B8;
+  --destructive:      #EF4444;  /* Coral Red — SELL Signal */
+  --border:           #1F293D;
+  --input:            #1F293D;
+  --ring:             #10B981;
+  --radius:           0.75rem;  /* 12px — rounded-xl */
+  /* Sidebar */
+  --sidebar:                    #0E1421;
+  --sidebar-foreground:         #F8FAFC;
+  --sidebar-primary:            #10B981;
+  --sidebar-primary-foreground: #090D16;
+  --sidebar-accent:             #182232;
+  --sidebar-accent-foreground:  #94A3B8;
+  --sidebar-border:             #1F293D;
+  --sidebar-ring:               #10B981;
+  /* Font vars */
+  --font-inter:          "Inter", sans-serif;
+  --font-jetbrains-mono: "JetBrains Mono", monospace;
+}
+
+/* .dark reinforces the same tokens (html always has class=dark) */
+.dark {
+  --background:       #090D16;
+  --foreground:       #F8FAFC;
+  --card:             #121826;
+  --card-foreground:  #F8FAFC;
+  --popover:          #121826;
+  --popover-foreground: #F8FAFC;
+  --primary:          #10B981;
+  --primary-foreground: #090D16;
+  --secondary:        #1F293D;
+  --secondary-foreground: #94A3B8;
+  --muted:            #1F293D;
+  --muted-foreground: #94A3B8;
+  --accent:           #182232;
+  --accent-foreground: #94A3B8;
+  --destructive:      #EF4444;
+  --border:           #1F293D;
+  --input:            #1F293D;
+  --ring:             #10B981;
+  --sidebar:                    #0E1421;
+  --sidebar-foreground:         #F8FAFC;
+  --sidebar-primary:            #10B981;
+  --sidebar-primary-foreground: #090D16;
+  --sidebar-accent:             #182232;
+  --sidebar-accent-foreground:  #94A3B8;
+  --sidebar-border:             #1F293D;
+  --sidebar-ring:               #10B981;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+    box-sizing: border-box;
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: "Inter", sans-serif;
+    min-height: 100vh;
+  }
+  html {
+    font-family: "Inter", sans-serif;
+    background-color: #090D16;
+    color: #F8FAFC;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+  /* JetBrains Mono for all tabular/data numbers */
+  .font-mono, code, kbd, samp, pre {
+    font-family: "JetBrains Mono", monospace;
+  }
+  ul, ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ==========================================================================
+   Info Trader Utility Classes — from StyleGuide.md
+   ========================================================================== */
+@layer utilities {
+  .text-signal-buy     { color: #10B981; }
+  .text-signal-sell    { color: #EF4444; }
+  .text-signal-neutral { color: #F59E0B; }
+  .bg-card-surface     { background-color: #121826; }
+  .bg-base             { background-color: #090D16; }
+  .border-subtle       { border-color: #1F293D; }
+  .border-buy          { border-color: #10B981; }
+  .border-sell         { border-color: #EF4444; }
+  .data-cell {
+    font-family: "JetBrains Mono", monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 13px;
+  }
+  .table-header {
+    background-color: #182232;
+    color: #94A3B8;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+  .badge-impact {
+    border-radius: 6px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 2px 8px;
+  }
 }
