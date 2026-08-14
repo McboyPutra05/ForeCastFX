@@ -4,7 +4,7 @@
  * Server Component: delegates UI rendering to HistoryPageUI.
  */
 
-import { HistoryPageUI } from "@/components/pages/HistoryPageUI";
+import { HistoryPageUI } from "@/pages/HistoryPageUI";
 
 export default function HistoryPage() {
   return <HistoryPageUI />;
