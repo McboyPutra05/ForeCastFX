@@ -4,7 +4,7 @@
  * Server Component: delegates UI rendering to CalendarPageUI.
  */
 
-import { CalendarPageUI } from "@/components/pages/CalendarPageUI";
+import { CalendarPageUI } from "@/pages/CalendarPageUI";
 
 export default function CalendarPage() {
   return <CalendarPageUI />;
