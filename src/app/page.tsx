@@ -6,7 +6,7 @@
 
 import { fetchLatestPrediction } from "@/lib/api/predictions";
 import type { LatestPrediction } from "@/types/prediction";
-import { DashboardPageUI } from "@/components/pages/DashboardPageUI";
+import { DashboardPageUI } from "@/pages/DashboardPageUI";
 
 // ---------------------------------------------------------------------------
 // Mock data for development (until backend is live)
