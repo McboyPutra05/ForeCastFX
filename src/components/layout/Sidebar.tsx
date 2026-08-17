@@ -1,5 +1,8 @@
+"use client";
+
 import { COLORS as C, SIGNAL_COLORS } from "@/lib/constants";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const NAV = [
   { label: "Dashboard",         icon: "◈", href: "/" },
@@ -9,6 +12,8 @@ const NAV = [
 ];
 
 export function Sidebar() {
+  const pathname = usePathname();
+
   return (
     <aside style={{
       width: "220px", minWidth: "220px",
@@ -37,19 +42,24 @@ export function Sidebar() {
       {/* Nav */}
       <nav style={{ padding: "16px 12px", flex: 1 }}>
         <div style={{ fontSize: "9px", color: C.textSecondary, textTransform: "uppercase", letterSpacing: "0.12em", padding: "0 8px", marginBottom: "8px" }}>Navigation</div>
-        {NAV.map((item) => (
-          <Link key={item.href} href={item.href} style={{
-            display: "flex", alignItems: "center", gap: "10px",
-            padding: "9px 12px", borderRadius: "8px",
-            fontSize: "13px", fontWeight: 500,
-            color: C.textSecondary,
-            textDecoration: "none", marginBottom: "2px",
-            transition: "all 0.15s",
-          }}>
-            <span style={{ fontSize: "14px" }}>{item.icon}</span>
-            {item.label}
-          </Link>
-        ))}
+        {NAV.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <Link key={item.href} href={item.href} style={{
+              display: "flex", alignItems: "center", gap: "10px",
+              padding: "9px 12px", borderRadius: "8px",
+              fontSize: "13px", fontWeight: 600,
+              backgroundColor: isActive ? "rgba(52, 211, 153, 0.1)" : "transparent",
+              color: isActive ? "#34D399" : C.textSecondary,
+              border: isActive ? "1px solid rgba(52, 211, 153, 0.2)" : "1px solid transparent",
+              textDecoration: "none", marginBottom: "4px",
+              transition: "all 0.15s",
+            }}>
+              <span style={{ fontSize: "15px", color: isActive ? "#34D399" : C.textSecondary }}>{item.icon}</span>
+              {item.label}
+            </Link>
+          );
+        })}
       </nav>
 
       {/* Status */}
