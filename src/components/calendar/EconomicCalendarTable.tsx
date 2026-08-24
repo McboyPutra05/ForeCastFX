@@ -16,6 +16,8 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export interface CalendarEvent {
   time: string;
+  date?: string; // Formatted date string (e.g. Mon, Aug 24)
+  release_date?: string; // Full ISO string for filtering
   currency: string;
   impact: "HIGH" | "MEDIUM" | "LOW";
   event: string;
@@ -32,8 +34,8 @@ interface EconomicCalendarTableProps {
 
 const IMPACT_COLORS: Record<string, { bg: string; text: string; label: string; icon?: string }> = {
   HIGH:   { bg: "rgba(220, 38, 38, 0.15)", text: "#EF4444", label: "HIGH", icon: "⚠" },
-  MEDIUM: { bg: "rgba(255, 255, 255, 0.1)", text: "#E2E8F0", label: "MED" },
-  LOW:    { bg: "rgba(255, 255, 255, 0.05)", text: "#94A3B8", label: "LOW" },
+  MEDIUM: { bg: "rgba(249, 115, 22, 0.15)", text: "#F97316", label: "MED" },
+  LOW:    { bg: "rgba(100, 116, 139, 0.15)", text: "#64748B", label: "LOW" },
 };
 
 const CURRENCY_BG: Record<string, string> = {
@@ -50,6 +52,9 @@ const CURRENCY_TEXT: Record<string, string> = {
   GBP: "#818CF8",
   CAD: "#F87171",
   NZD: "#C084FC",
+  AUD: "#60A5FA", // Blue
+  JPY: "#F472B6", // Pink
+  CHF: "#9CA3AF", // Gray
 };
 export function EconomicCalendarTable({ events }: EconomicCalendarTableProps) {
   const [activeTab, setActiveTab] = useState("Tomorrow");
@@ -63,9 +68,13 @@ export function EconomicCalendarTable({ events }: EconomicCalendarTableProps) {
   const [showGBP, setShowGBP] = useState(true);
   const [showCAD, setShowCAD] = useState(true);
   const [showNZD, setShowNZD] = useState(true);
+  const [showAUD, setShowAUD] = useState(true);
+  const [showJPY, setShowJPY] = useState(true);
+  const [showCHF, setShowCHF] = useState(true);
 
   // Filter the events
   const filteredEvents = events.filter((ev) => {
+    // Impact & Currency Filters
     if (ev.impact === "HIGH" && !showHighImpact) return false;
     if (ev.impact === "MEDIUM" && !showMediumImpact) return false;
     if (ev.impact === "LOW" && !showLowImpact) return false;
@@ -75,6 +84,39 @@ export function EconomicCalendarTable({ events }: EconomicCalendarTableProps) {
     if (ev.currency === "GBP" && !showGBP) return false;
     if (ev.currency === "CAD" && !showCAD) return false;
     if (ev.currency === "NZD" && !showNZD) return false;
+    if (ev.currency === "AUD" && !showAUD) return false;
+    if (ev.currency === "JPY" && !showJPY) return false;
+    if (ev.currency === "CHF" && !showCHF) return false;
+    
+    // Time Tab Filters
+    if (ev.release_date) {
+      const release = new Date(ev.release_date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      const dayAfterTomorrow = new Date(today);
+      dayAfterTomorrow.setDate(today.getDate() + 2);
+      // Calculate start of this week (Monday)
+      const startOfWeek = new Date(today);
+      const day = startOfWeek.getDay();
+      const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+      startOfWeek.setDate(diff);
+      
+      // Calculate end of this week (next Monday)
+      const nextWeek = new Date(startOfWeek);
+      nextWeek.setDate(startOfWeek.getDate() + 7);
+
+      if (activeTab === "Today") {
+        if (release < today || release >= tomorrow) return false;
+      } else if (activeTab === "Tomorrow") {
+        if (release < tomorrow || release >= dayAfterTomorrow) return false;
+      } else if (activeTab === "This Week") {
+        if (release < startOfWeek || release >= nextWeek) return false;
+      }
+    }
 
     return true;
   });
@@ -124,6 +166,15 @@ export function EconomicCalendarTable({ events }: EconomicCalendarTableProps) {
               <DropdownMenuCheckboxItem checked={showNZD} onCheckedChange={setShowNZD} className="hover:bg-[#1E293B] cursor-pointer">
                 NZD
               </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem checked={showAUD} onCheckedChange={setShowAUD} className="hover:bg-[#1E293B] cursor-pointer">
+                AUD
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem checked={showJPY} onCheckedChange={setShowJPY} className="hover:bg-[#1E293B] cursor-pointer">
+                JPY
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem checked={showCHF} onCheckedChange={setShowCHF} className="hover:bg-[#1E293B] cursor-pointer">
+                CHF
+              </DropdownMenuCheckboxItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -150,13 +201,13 @@ export function EconomicCalendarTable({ events }: EconomicCalendarTableProps) {
         <div
           className="grid"
           style={{
-            gridTemplateColumns: "80px 70px 100px 1fr 90px 90px 90px 100px",
+            gridTemplateColumns: "100px 80px 70px 100px 1fr 90px 90px 90px 100px",
             backgroundColor: "#111827",
             padding: "12px 16px",
             borderBottom: `1px solid ${COLORS.border}`,
           }}
         >
-          {["TIME", "CUR", "IMPACT", "EVENT", "ACTUAL", "FORECAST", "PREVIOUS", "TREND"].map((h) => (
+          {["DATE", "TIME", "CUR", "IMPACT", "EVENT", "ACTUAL", "FORECAST", "PREVIOUS", "TREND"].map((h) => (
             <span key={h} style={{ fontSize: "10px", fontWeight: 700, color: COLORS.textSecondary, textTransform: "uppercase", letterSpacing: "0.05em" }}>
               {h}
             </span>
@@ -197,7 +248,7 @@ function CalendarRow({ event: ev, isLast }: { event: CalendarEvent; isLast: bool
     <div
       className="grid items-center transition-colors duration-150"
       style={{
-        gridTemplateColumns: "80px 70px 100px 1fr 90px 90px 90px 100px",
+        gridTemplateColumns: "100px 80px 70px 100px 1fr 90px 90px 90px 100px",
         padding: "14px 16px",
         backgroundColor: COLORS.cardSurface,
         borderBottom: isLast ? "none" : `1px solid ${COLORS.border}`,
@@ -207,6 +258,10 @@ function CalendarRow({ event: ev, isLast }: { event: CalendarEvent; isLast: bool
       onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#1E293B")}
       onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = COLORS.cardSurface)}
     >
+      <span style={{ fontSize: "12px", color: COLORS.textPrimary, fontWeight: 500 }}>
+        {ev.date || "—"}
+      </span>
+
       <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "12px", color: COLORS.textSecondary }}>
         {ev.time}
       </span>
