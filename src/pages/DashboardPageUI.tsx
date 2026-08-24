@@ -4,15 +4,7 @@ import { EconomicCalendarTable } from "@/components/calendar/EconomicCalendarTab
 import type { LatestPrediction } from "@/types/prediction";
 import { COLORS } from "@/lib/constants";
 
-// ---------------------------------------------------------------------------
-// Mock calendar events
-// ---------------------------------------------------------------------------
-const MOCK_CALENDAR = [
-  { time: "08:30", currency: "USD", impact: "HIGH"   as const, event: "Non Farm Payrolls",           actual: "275K", forecast: "200K", previous: "229K", result: "BETTER"  as const, trendData: [0.3, 0.4, 0.4, 0.6, 1.0] },
-  { time: "10:00", currency: "EUR", impact: "MEDIUM" as const, event: "ECB President Lagarde Speaks", actual: "—",    forecast: "—",    previous: "—",    result: "NEUTRAL" as const, trendData: [0.1, 0.1] },
-  { time: "12:30", currency: "GBP", impact: "LOW"    as const, event: "BOE Consumer Credit",         actual: "1.2B", forecast: "1.5B", previous: "1.6B", result: "WORSE"   as const, trendData: [0.8, 0.7, 0.6, 0.5, 0.2] },
-  { time: "14:00", currency: "USD", impact: "HIGH"   as const, event: "CPI m/m",                     actual: "0.4%", forecast: "0.3%", previous: "0.3%", result: "BETTER"  as const, trendData: [0.2, 0.2, 0.3, 0.3, 0.8] },
-];
+// MOCK_CALENDAR removed - using live data from DB
 
 function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
@@ -27,7 +19,24 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }
   );
 }
 
-export function DashboardPageUI({ prediction }: { prediction: LatestPrediction }) {
+export function DashboardPageUI({ prediction, calendarEvents = [] }: { prediction: LatestPrediction | null, calendarEvents?: any[] }) {
+  // Format live calendar events to match component's expected structure
+  const formattedCalendar = calendarEvents.map(evt => {
+    const d = new Date(evt.release_date);
+    return {
+      date: d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }),
+      release_date: evt.release_date,
+      time: d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      currency: evt.country_code,
+      impact: evt.impact as any,
+      event: evt.event_name,
+      actual: "—", // Upcoming events don't have actuals yet
+      forecast: evt.forecast_value ? String(evt.forecast_value) : "—",
+      previous: evt.previous_value ? String(evt.previous_value) : "—",
+      result: "NEUTRAL" as const,
+      trendData: [0.5, 0.5, 0.5] // Stub trend
+    };
+  });
   return (
     <main
       className="flex-1 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-8"
@@ -56,7 +65,26 @@ export function DashboardPageUI({ prediction }: { prediction: LatestPrediction }
           </div>
         }
       >
-        <HeroPredictionFrame prediction={prediction} />
+        {prediction ? (
+          <HeroPredictionFrame prediction={prediction} />
+        ) : (
+          <div
+            style={{
+              backgroundColor: COLORS.cardSurface,
+              border: `3px solid ${COLORS.border}`,
+              borderRadius: "12px",
+              padding: "40px",
+              height: "280px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: COLORS.textSecondary,
+              fontSize: "13px",
+            }}
+          >
+            No upcoming predictions available at the moment.
+          </div>
+        )}
       </Suspense>
 
       {/* ------------------------------------------------------------------ */}
@@ -67,7 +95,7 @@ export function DashboardPageUI({ prediction }: { prediction: LatestPrediction }
           title="Upcoming Economic Events"
           subtitle="High Impact US macroeconomic releases — sorted by schedule"
         />
-        <EconomicCalendarTable events={MOCK_CALENDAR} />
+        <EconomicCalendarTable events={formattedCalendar} />
       </section>
 
       {/* ------------------------------------------------------------------ */}
@@ -76,7 +104,7 @@ export function DashboardPageUI({ prediction }: { prediction: LatestPrediction }
       <section aria-label="Leading Indicators Analysis">
         <SectionHeader
           title="Leading Indicators Analysis"
-          subtitle={`Factors influencing the next ${prediction.event_code} prediction`}
+          subtitle={prediction ? `Factors influencing the next ${prediction.event_code} prediction` : "Factors influencing macroeconomic predictions"}
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="flex flex-col gap-3 p-5 rounded-xl border" style={{ backgroundColor: COLORS.cardSurface, borderColor: COLORS.border }}>
