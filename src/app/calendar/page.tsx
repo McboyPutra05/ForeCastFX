@@ -5,7 +5,19 @@
  */
 
 import { CalendarPageUI } from "@/pages/CalendarPageUI";
+import { fetchUpcomingEvents } from "@/lib/api/calendar";
 
-export default function CalendarPage() {
-  return <CalendarPageUI />;
+async function getCalendarEvents() {
+  try {
+    const data = await fetchUpcomingEvents(50); // Get more events for the full calendar page
+    return data.events || [];
+  } catch (error) {
+    console.error("Failed to fetch calendar events:", error);
+    return [];
+  }
+}
+
+export default async function CalendarPage() {
+  const events = await getCalendarEvents();
+  return <CalendarPageUI calendarEvents={events} />;
 }
