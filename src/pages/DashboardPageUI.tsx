@@ -26,7 +26,7 @@ export function DashboardPageUI({ prediction, calendarEvents = [] }: { predictio
     return {
       date: d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }),
       release_date: evt.release_date,
-      time: d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      time: d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
       currency: evt.country_code,
       impact: evt.impact as any,
       event: evt.event_name,
@@ -104,56 +104,28 @@ export function DashboardPageUI({ prediction, calendarEvents = [] }: { predictio
       <section aria-label="Leading Indicators Analysis">
         <SectionHeader
           title="Leading Indicators Analysis"
-          subtitle={prediction ? `Factors influencing the next ${prediction.event_code} prediction` : "Factors influencing macroeconomic predictions"}
+          subtitle={prediction ? `Factors influencing the next ${prediction.event_name} prediction` : "Factors influencing macroeconomic predictions"}
         />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="flex flex-col gap-3 p-5 rounded-xl border" style={{ backgroundColor: COLORS.cardSurface, borderColor: COLORS.border }}>
-            <div className="flex justify-between items-start">
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">US Dollar Index</span>
-              <span className="px-2 py-0.5 rounded-sm bg-[#10B981] text-white text-[10px] font-bold tracking-wider">BULLISH</span>
+          {prediction?.leading_indicators?.length ? (
+            prediction.leading_indicators.map((ind: any, idx: number) => (
+              <div key={idx} className="flex flex-col gap-3 p-5 rounded-xl border" style={{ backgroundColor: COLORS.cardSurface, borderColor: COLORS.border }}>
+                <div className="flex justify-between items-start">
+                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">{ind.name}</span>
+                  <span className="px-2 py-0.5 rounded-sm text-white text-[10px] font-bold tracking-wider" style={{ backgroundColor: ind.bg }}>{ind.signal}</span>
+                </div>
+                <div className="flex items-end gap-2 mt-1">
+                  <span className="text-2xl font-bold text-white">{ind.value}</span>
+                  <span className="text-xs font-bold mb-1" style={{ color: ind.color }}>{ind.change}</span>
+                </div>
+                <div className="text-[10px] font-bold text-gray-500 mt-2">{ind.desc}</div>
+              </div>
+            ))
+          ) : (
+            <div className="col-span-full py-8 text-center text-sm text-gray-500">
+              No leading indicators available for this event yet.
             </div>
-            <div className="flex items-end gap-2 mt-1">
-              <span className="text-2xl font-bold text-white">104.25</span>
-              <span className="text-xs font-bold text-[#34D399] mb-1">↑ +0.4%</span>
-            </div>
-            <div className="text-[10px] font-bold text-gray-500 mt-2">Strong correlation (+0.82)</div>
-          </div>
-
-          <div className="flex flex-col gap-3 p-5 rounded-xl border" style={{ backgroundColor: COLORS.cardSurface, borderColor: COLORS.border }}>
-            <div className="flex justify-between items-start">
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">US 10Y Yield</span>
-              <span className="px-2 py-0.5 rounded-sm bg-[#EF4444] text-white text-[10px] font-bold tracking-wider">BEARISH</span>
-            </div>
-            <div className="flex items-end gap-2 mt-1">
-              <span className="text-2xl font-bold text-white">4.32%</span>
-              <span className="text-xs font-bold text-[#EF4444] mb-1">↓ -0.15%</span>
-            </div>
-            <div className="text-[10px] font-bold text-gray-500 mt-2">Moderate correlation (-0.45)</div>
-          </div>
-
-          <div className="flex flex-col gap-3 p-5 rounded-xl border" style={{ backgroundColor: COLORS.cardSurface, borderColor: COLORS.border }}>
-            <div className="flex justify-between items-start">
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">ISM Services</span>
-              <span className="px-2 py-0.5 rounded-sm bg-[#10B981] text-white text-[10px] font-bold tracking-wider">BULLISH</span>
-            </div>
-            <div className="flex items-end gap-2 mt-1">
-              <span className="text-2xl font-bold text-white">52.6</span>
-              <span className="text-xs font-bold text-[#34D399] mb-1">↑ +1.2</span>
-            </div>
-            <div className="text-[10px] font-bold text-gray-500 mt-2">Expansion signals positive growth</div>
-          </div>
-
-          <div className="flex flex-col gap-3 p-5 rounded-xl border" style={{ backgroundColor: COLORS.cardSurface, borderColor: COLORS.border }}>
-            <div className="flex justify-between items-start">
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Jobless Claims</span>
-              <span className="px-2 py-0.5 rounded-sm bg-[#475569] text-white text-[10px] font-bold tracking-wider">NEUTRAL</span>
-            </div>
-            <div className="flex items-end gap-2 mt-1">
-              <span className="text-2xl font-bold text-white">215K</span>
-              <span className="text-xs font-bold text-gray-400 mb-1">— 0K</span>
-            </div>
-            <div className="text-[10px] font-bold text-gray-500 mt-2">In line with historical averages</div>
-          </div>
+          )}
         </div>
       </section>
     </main>
