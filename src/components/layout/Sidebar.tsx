@@ -25,16 +25,14 @@ export function Sidebar() {
       {/* Logo */}
       <div style={{ padding: "24px 20px", borderBottom: `1px solid ${C.border}` }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <div style={{
-            width: "30px", height: "30px",
-            backgroundColor: SIGNAL_COLORS.BUY, borderRadius: "6px",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: "12px", fontWeight: 800, color: C.backgroundPrimary,
-            fontFamily: "'Inter', sans-serif",
-          }}>IT</div>
+          <img 
+            src="/logo-forecastFX.png" 
+            alt="ForeCastFX Logo" 
+            style={{ width: "32px", height: "32px", objectFit: "cover", borderRadius: "8px" }} 
+          />
           <div>
-            <div style={{ fontSize: "14px", fontWeight: 700, color: C.textPrimary, lineHeight: 1.1 }}>Info Trader</div>
-            <div style={{ fontSize: "9px", color: C.textSecondary, textTransform: "uppercase", letterSpacing: "0.1em" }}>XAUUSD Signals</div>
+            <div style={{ fontSize: "16px", fontWeight: 700, color: C.textPrimary, lineHeight: 1.1, fontFamily: "'TAN Angleton', sans-serif" }}>ForeCastFX</div>
+            <div style={{ fontSize: "9px", color: C.textSecondary, textTransform: "uppercase", letterSpacing: "0.1em", marginTop: "2px" }}>XAUUSD Signals</div>
           </div>
         </div>
       </div>
