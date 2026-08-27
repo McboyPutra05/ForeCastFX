@@ -27,8 +27,8 @@ const jetbrainsMono = JetBrains_Mono({
 // ---------------------------------------------------------------------------
 export const metadata: Metadata = {
   title: {
-    default: "Info Trader — US Macroeconomic Prediction Dashboard",
-    template: "%s | Info Trader",
+    default: "ForeCastFX — US Macroeconomic Prediction Dashboard",
+    template: "%s | ForeCastFX",
   },
   description:
     "AI-powered US macroeconomic news prediction dashboard for XAUUSD traders. " +
