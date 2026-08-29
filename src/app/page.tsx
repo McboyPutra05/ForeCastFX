@@ -5,39 +5,29 @@
  */
 
 import { fetchLatestPrediction } from "@/lib/api/predictions";
+import { fetchUpcomingEvents } from "@/lib/api/calendar";
 import type { LatestPrediction } from "@/types/prediction";
 import { DashboardPageUI } from "@/pages/DashboardPageUI";
 
 // ---------------------------------------------------------------------------
-// Mock data for development (until backend is live)
+// Data fetcher
 // ---------------------------------------------------------------------------
-const MOCK_PREDICTION: LatestPrediction = {
-  signal: "BUY",
-  signal_label: "BUY XAUUSD",
-  signal_subtitle: "Predicted Bias: BAD FOR USD (Dovish CPI)",
-  confidence_score: 72.5,
-  event_name: "US Consumer Price Index (CPI)",
-  event_code: "CPI",
-  release_date: new Date(Date.now() + 86400 * 1000 * 2).toISOString(),
-  countdown_seconds: 86400 * 2,
-  composite_score: -0.41,
-  engine_metadata: {
-    indicators: [
-      { code: "PPI",          weight: 0.45, actual: 2.1,  forecast: 2.5,  deviation: -0.4, raw_score: -0.16,  weighted_score: -0.072  },
-      { code: "ISM_MFG",      weight: 0.30, actual: 48.8, forecast: 50.2, deviation: -1.4, raw_score: -0.028, weighted_score: -0.0084 },
-      { code: "RETAIL_SALES", weight: 0.25, actual: -0.2, forecast: 0.3,  deviation: -0.5, raw_score: -1.0,   weighted_score: -0.25   },
-    ],
-  },
-};
-
-// ---------------------------------------------------------------------------
-// Data fetcher with mock fallback
-// ---------------------------------------------------------------------------
-async function getPrediction(): Promise<LatestPrediction> {
+async function getPrediction(): Promise<LatestPrediction | null> {
   try {
     return await fetchLatestPrediction();
-  } catch {
-    return MOCK_PREDICTION;
+  } catch (error) {
+    console.error("Failed to fetch prediction:", error);
+    return null;
+  }
+}
+
+async function getCalendarEvents() {
+  try {
+    const data = await fetchUpcomingEvents(50); // Fetch enough events so client-side filters work correctly
+    return data.events || [];
+  } catch (error) {
+    console.error("Failed to fetch calendar events:", error);
+    return [];
   }
 }
 
@@ -46,8 +36,11 @@ async function getPrediction(): Promise<LatestPrediction> {
 // ---------------------------------------------------------------------------
 export default async function DashboardPage() {
   // 1. Fetch data on the server
-  const prediction = await getPrediction();
+  const [prediction, calendarEvents] = await Promise.all([
+    getPrediction(),
+    getCalendarEvents()
+  ]);
 
   // 2. Delegate UI rendering to the clean components/pages folder
-  return <DashboardPageUI prediction={prediction} />;
+  return <DashboardPageUI prediction={prediction} calendarEvents={calendarEvents} />;
 }
