@@ -10,7 +10,7 @@ export function CalendarPageUI({ calendarEvents = [] }: { calendarEvents?: any[]
     return {
       date: d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }),
       release_date: evt.release_date,
-      time: d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      time: d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
       currency: evt.country_code,
       impact: evt.impact as any,
       event: evt.event_name,
