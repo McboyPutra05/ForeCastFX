@@ -22,6 +22,16 @@ export interface EngineMetadata {
   indicators: IndicatorBreakdown[];
 }
 
+export interface LeadingIndicator {
+  name: string;
+  signal: string;
+  value: string;
+  change: string;
+  color: string;
+  bg: string;
+  desc: string;
+}
+
 /**
  * Full prediction result for the Hero Prediction Frame.
  * Returned by GET /api/v1/predictions/latest
@@ -44,6 +54,8 @@ export interface LatestPrediction {
   /** Seconds until release */
   countdown_seconds: number;
   engine_metadata: EngineMetadata;
+  /** Extracted leading indicators for the dashboard */
+  leading_indicators?: LeadingIndicator[];
 }
 
 /**
