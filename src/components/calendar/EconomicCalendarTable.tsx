@@ -57,7 +57,7 @@ const CURRENCY_TEXT: Record<string, string> = {
   CHF: "#9CA3AF", // Gray
 };
 export function EconomicCalendarTable({ events }: EconomicCalendarTableProps) {
-  const [activeTab, setActiveTab] = useState("Tomorrow");
+  const [activeTab, setActiveTab] = useState("All");
   const [showHighImpact, setShowHighImpact] = useState(true);
   const [showMediumImpact, setShowMediumImpact] = useState(true);
   const [showLowImpact, setShowLowImpact] = useState(true);
@@ -179,9 +179,12 @@ export function EconomicCalendarTable({ events }: EconomicCalendarTableProps) {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Tabs defaultValue="Tomorrow" className="w-[300px] h-8 bg-[#121826] border-[#1F293D] border rounded-md" onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3 h-full bg-transparent p-0">
-            <TabsTrigger value="Today" className="text-xs text-gray-400 data-[state=active]:bg-white/5 data-[state=active]:text-white h-full rounded-none rounded-l-md border-r border-[#1F293D]">
+        <Tabs defaultValue="All" className="w-[360px] h-8 bg-[#121826] border-[#1F293D] border rounded-md" onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-4 h-full bg-transparent p-0">
+            <TabsTrigger value="All" className="text-xs text-gray-400 data-[state=active]:bg-white/5 data-[state=active]:text-white h-full rounded-none rounded-l-md border-r border-[#1F293D]">
+              All
+            </TabsTrigger>
+            <TabsTrigger value="Today" className="text-xs text-gray-400 data-[state=active]:bg-white/5 data-[state=active]:text-white h-full rounded-none border-r border-[#1F293D]">
               Today
             </TabsTrigger>
             <TabsTrigger value="Tomorrow" className="text-xs text-gray-400 data-[state=active]:bg-white/5 data-[state=active]:text-white h-full rounded-none border-r border-[#1F293D]">
@@ -258,11 +261,17 @@ function CalendarRow({ event: ev, isLast }: { event: CalendarEvent; isLast: bool
       onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#1E293B")}
       onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = COLORS.cardSurface)}
     >
-      <span style={{ fontSize: "12px", color: COLORS.textPrimary, fontWeight: 500 }}>
+      <span
+        style={{ fontSize: "12px", color: COLORS.textPrimary, fontWeight: 500 }}
+        suppressHydrationWarning
+      >
         {ev.date || "—"}
       </span>
 
-      <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "12px", color: COLORS.textSecondary }}>
+      <span
+        style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "12px", color: COLORS.textSecondary }}
+        suppressHydrationWarning
+      >
         {ev.time}
       </span>
 
