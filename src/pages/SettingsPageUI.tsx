@@ -207,3 +207,5 @@ function ToggleSwitch({ checked, onChange }: { checked: boolean, onChange: (c: b
     </div>
   );
 }
+
+export default SettingsPageUI;

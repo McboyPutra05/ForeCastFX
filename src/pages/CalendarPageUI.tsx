@@ -8,10 +8,10 @@ export function CalendarPageUI({ calendarEvents = [] }: { calendarEvents?: any[]
   const formattedCalendar = calendarEvents.map(evt => {
     const d = new Date(evt.release_date);
     return {
-      date: d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }),
+      date: d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
       release_date: evt.release_date,
       time: d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
-      currency: evt.country_code,
+      currency: evt.country_code === "US" ? "USD" : evt.country_code,
       impact: evt.impact as any,
       event: evt.event_name,
       actual: "—", // Upcoming events don't have actuals yet
@@ -40,3 +40,5 @@ export function CalendarPageUI({ calendarEvents = [] }: { calendarEvents?: any[]
     </main>
   );
 }
+
+export default CalendarPageUI;

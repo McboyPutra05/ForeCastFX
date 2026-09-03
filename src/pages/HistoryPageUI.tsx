@@ -24,6 +24,11 @@ export function HistoryPageUI({
   const [activeFilter, setActiveFilter] = useState<Indicator>("ALL");
   const [historyData, setHistoryData] = useState(initialHistoryData);
   const [isLoading, setIsLoading] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (activeFilter === "ALL") {
@@ -80,7 +85,7 @@ export function HistoryPageUI({
     .reverse()
     .slice(-6)
     .map((r: any) => ({
-      name: new Date(r.release_date).toLocaleDateString(undefined, { month: 'short' }),
+      name: new Date(r.release_date).toLocaleDateString('en-US', { month: 'short' }),
       predicted: r.predicted_signal === "BUY" ? 1 : r.predicted_signal === "SELL" ? -1 : 0, // Placeholder mapping since we don't predict values anymore
       actual: r.is_correct ? 1 : (r.is_correct === false ? -1 : 0),
     }));
@@ -153,21 +158,27 @@ export function HistoryPageUI({
           </div>
         </div>
 
-        <div className="h-[250px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }} barGap={0}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1F293D" vertical={false} />
-              <XAxis dataKey="name" stroke="#475569" tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 700 }} axisLine={false} tickLine={false} dy={10} />
-              <YAxis stroke="#475569" tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 700 }} tickFormatter={(val) => `${val}`} axisLine={false} tickLine={false} dx={-10} />
-              <Tooltip 
-                cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                contentStyle={{ backgroundColor: '#0E1421', border: `1px solid ${COLORS.border}`, borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}
-                itemStyle={{ color: '#E2E8F0' }}
-              />
-              <Bar dataKey="actual" fill="#475569" radius={[2, 2, 0, 0]} barSize={12} />
-              <Bar dataKey="predicted" fill="#34D399" radius={[2, 2, 0, 0]} barSize={12} />
-            </BarChart>
-          </ResponsiveContainer>
+        <div className="h-[250px] w-full min-w-0 min-h-[250px]">
+          {isMounted ? (
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={250}>
+              <BarChart data={chartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }} barGap={0}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1F293D" vertical={false} />
+                <XAxis dataKey="name" stroke="#475569" tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 700 }} axisLine={false} tickLine={false} dy={10} />
+                <YAxis stroke="#475569" tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 700 }} tickFormatter={(val) => `${val}`} axisLine={false} tickLine={false} dx={-10} />
+                <Tooltip 
+                  cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                  contentStyle={{ backgroundColor: '#0E1421', border: `1px solid ${COLORS.border}`, borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}
+                  itemStyle={{ color: '#E2E8F0' }}
+                />
+                <Bar dataKey="actual" fill="#475569" radius={[2, 2, 0, 0]} barSize={12} />
+                <Bar dataKey="predicted" fill="#34D399" radius={[2, 2, 0, 0]} barSize={12} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-[250px] w-full flex items-center justify-center text-xs text-gray-500">
+              Loading chart...
+            </div>
+          )}
         </div>
       </div>
 
@@ -207,7 +218,7 @@ export function HistoryPageUI({
                   
                   return (
                     <tr key={idx} className="border-b transition-colors hover:bg-white/5" style={{ borderColor: COLORS.border }}>
-                      <td className="py-4 px-5">{new Date(row.release_date).toLocaleDateString()}</td>
+                      <td className="py-4 px-5" suppressHydrationWarning>{new Date(row.release_date).toLocaleDateString('en-US')}</td>
                       <td className="py-4 px-5">{row.event_name}</td>
                       <td className="py-4 px-5">
                         {row.predicted_signal ? (
@@ -242,3 +253,5 @@ export function HistoryPageUI({
     </main>
   );
 }
+
+export default HistoryPageUI;
