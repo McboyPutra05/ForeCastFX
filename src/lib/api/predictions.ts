@@ -4,15 +4,18 @@
  */
 
 import type { LatestPrediction, PredictionLogEntry } from "@/types/prediction";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
+import { API_BASE_URL } from "@/lib/constants";
 
 /**
  * Fetch the latest BUY/SELL prediction for the nearest High Impact event.
  * Powers the Hero Prediction Frame.
  */
-export async function fetchLatestPrediction(): Promise<LatestPrediction> {
-  const res = await fetch(`${API_BASE}/predictions/latest`, {
+export async function fetchLatestPrediction(eventCode?: string): Promise<LatestPrediction> {
+  const url = eventCode
+    ? `${API_BASE_URL}/predictions/latest?event_code=${encodeURIComponent(eventCode)}`
+    : `${API_BASE_URL}/predictions/latest`;
+
+  const res = await fetch(url, {
     next: { revalidate: 30 }, // ISR: revalidate every 30 seconds
     headers: { "Content-Type": "application/json" },
   });
@@ -28,7 +31,7 @@ export async function fetchLatestPrediction(): Promise<LatestPrediction> {
  * Fetch a specific prediction log entry by ID.
  */
 export async function fetchPredictionById(id: string): Promise<PredictionLogEntry> {
-  const res = await fetch(`${API_BASE}/predictions/${id}`, {
+  const res = await fetch(`${API_BASE_URL}/predictions/${id}`, {
     cache: "no-store",
   });
 

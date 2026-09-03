@@ -3,10 +3,10 @@
  * API client for historical and accuracy endpoints.
  */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
+import { API_BASE_URL } from "@/lib/constants";
 
 export async function fetchHistoricalReleases(eventCode?: string) {
-  const url = new URL(`${API_BASE}/history/`);
+  const url = new URL(`${API_BASE_URL}/history/`);
   if (eventCode) {
     url.searchParams.append("event_code", eventCode);
   }
@@ -23,7 +23,7 @@ export async function fetchHistoricalReleases(eventCode?: string) {
 }
 
 export async function fetchAccuracySummary() {
-  const res = await fetch(`${API_BASE}/history/accuracy-summary`, {
+  const res = await fetch(`${API_BASE_URL}/history/accuracy-summary`, {
     next: { revalidate: 60 },
     headers: { "Content-Type": "application/json" },
   });

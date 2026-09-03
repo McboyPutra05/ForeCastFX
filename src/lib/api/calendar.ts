@@ -3,10 +3,10 @@
  * API client for calendar endpoints.
  */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
+import { API_BASE_URL } from "@/lib/constants";
 
 export async function fetchUpcomingEvents(limit = 10) {
-  const res = await fetch(`${API_BASE}/calendar/upcoming?limit=${limit}`, {
+  const res = await fetch(`${API_BASE_URL}/calendar/upcoming?limit=${limit}`, {
     next: { revalidate: 60 },
     headers: { "Content-Type": "application/json" },
   });
