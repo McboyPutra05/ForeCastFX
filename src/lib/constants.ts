@@ -77,7 +77,9 @@ export const SIGNAL_LABELS: Record<SignalDirection, string> = {
 // ---------------------------------------------------------------------------
 
 export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
+  (typeof window === "undefined" && process.env.INTERNAL_API_URL)
+    ? process.env.INTERNAL_API_URL
+    : (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1");
 
 /** Hero Frame prediction polling interval (ms) */
 export const PREDICTION_POLL_INTERVAL_MS = 30_000;
