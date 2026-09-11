@@ -29,12 +29,13 @@ export type Indicator =
   | "ALL"
   | "NFP"
   | "CPI"
+  | "PCE"
   | "PPI"
   | "FOMC"
   | "GDP"
   | "RETAIL_SALES"
-  | "UNEMPLOYMENT"
-  | "ISM_SVC";
+  | "ISM_SVC"
+  | "ISM_MFG";
 
 export const MONTH_OPTIONS = [
   { value: "this_month", label: "This Month (Sep 2026)" },
@@ -48,15 +49,16 @@ export const MONTH_OPTIONS = [
 ];
 
 export const INDICATOR_OPTIONS: { value: Indicator; label: string }[] = [
-  { value: "ALL", label: "All High Impact Indicators" },
+  { value: "ALL", label: "All Tier-1 Major Indicators" },
   { value: "NFP", label: "Non-Farm Payrolls (NFP)" },
   { value: "CPI", label: "Consumer Price Index (CPI)" },
+  { value: "PCE", label: "Core PCE Price Index m/m" },
   { value: "PPI", label: "Producer Price Index (PPI)" },
   { value: "FOMC", label: "Fed Interest Rate (FOMC)" },
   { value: "GDP", label: "Gross Domestic Product (GDP)" },
-  { value: "RETAIL_SALES", label: "Retail Sales" },
-  { value: "UNEMPLOYMENT", label: "Unemployment Rate" },
+  { value: "RETAIL_SALES", label: "Advance Retail Sales" },
   { value: "ISM_SVC", label: "ISM Services PMI" },
+  { value: "ISM_MFG", label: "ISM Manufacturing PMI" },
 ];
 
 export function HistoryPageUI({
