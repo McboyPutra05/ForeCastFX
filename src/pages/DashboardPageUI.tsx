@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { HeroPredictionFrame } from "@/components/hero/HeroPredictionFrame";
 import { EconomicCalendarTable } from "@/components/calendar/EconomicCalendarTable";
 import type { LatestPrediction } from "@/types/prediction";
@@ -20,19 +20,62 @@ function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }
 }
 
 export function DashboardPageUI({
-  prediction,
-  calendarEvents = [],
+  prediction: initialPrediction,
+  calendarEvents: initialCalendar = [],
 }: {
   prediction: LatestPrediction | null;
   calendarEvents?: any[];
 }) {
+  const [prediction, setPrediction] = useState<LatestPrediction | null>(initialPrediction);
+  const [calendarEvents, setCalendarEvents] = useState<any[]>(initialCalendar);
+
+  // Sync state with props if props change
+  useEffect(() => {
+    if (initialPrediction) setPrediction(initialPrediction);
+  }, [initialPrediction]);
+
+  useEffect(() => {
+    if (initialCalendar?.length) setCalendarEvents(initialCalendar);
+  }, [initialCalendar]);
+
+  // Polling function to automatically refresh the active prediction and calendar
+  const refreshData = useCallback(async () => {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
+      const [predRes, calRes] = await Promise.all([
+        fetch(`${baseUrl}/predictions/latest`, { cache: "no-store" }),
+        fetch(`${baseUrl}/calendar/upcoming?limit=50`, { cache: "no-store" }),
+      ]);
+
+      if (predRes.ok) {
+        const predData = await predRes.json();
+        setPrediction(predData);
+      }
+
+      if (calRes.ok) {
+        const calData = await calRes.json();
+        if (calData?.events) {
+          setCalendarEvents(calData.events);
+        }
+      }
+    } catch (err) {
+      console.warn("Auto-refresh poll notice:", err);
+    }
+  }, []);
+
+  // Poll every 15 seconds to ensure real-time synchronization with economic schedule
+  useEffect(() => {
+    const timer = setInterval(refreshData, 15000);
+    return () => clearInterval(timer);
+  }, [refreshData]);
+
   // Format live calendar events to match component's expected structure
-  const formattedCalendar = calendarEvents.map(evt => {
+  const formattedCalendar = calendarEvents.map((evt) => {
     const d = new Date(evt.release_date);
     return {
-      date: d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+      date: d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }),
       release_date: evt.release_date,
-      time: d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
+      time: d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }),
       currency: evt.country_code === "US" ? "USD" : evt.country_code,
       impact: evt.impact as any,
       event: evt.event_name,
@@ -40,7 +83,7 @@ export function DashboardPageUI({
       forecast: evt.forecast_value !== null && evt.forecast_value !== undefined ? String(evt.forecast_value) : "—",
       previous: evt.previous_value !== null && evt.previous_value !== undefined ? String(evt.previous_value) : "—",
       result: (evt.bias_recommendation || "NEUTRAL") as any,
-      trendData: [0.5, 0.5, 0.5]
+      trendData: [0.5, 0.5, 0.5],
     };
   });
 
@@ -52,50 +95,29 @@ export function DashboardPageUI({
       {/* ------------------------------------------------------------------ */}
       {/* Hero Prediction Frame — TOPMOST, FULL WIDTH (HIGH PRIORITY)        */}
       {/* ------------------------------------------------------------------ */}
-      <Suspense
-        fallback={
-          <div
-            style={{
-              backgroundColor: COLORS.cardSurface,
-              border: `3px solid ${COLORS.border}`,
-              borderRadius: "12px",
-              padding: "40px",
-              height: "280px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: COLORS.textSecondary,
-              fontSize: "13px",
-            }}
-          >
-            Loading prediction signal...
-          </div>
-        }
-      >
-        {prediction ? (
-          <HeroPredictionFrame prediction={prediction} />
-        ) : (
-          <div
-            style={{
-              backgroundColor: COLORS.cardSurface,
-              border: `3px solid ${COLORS.border}`,
-              borderRadius: "12px",
-              padding: "40px",
-              height: "280px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: COLORS.textSecondary,
-              fontSize: "13px",
-            }}
-          >
-            No upcoming predictions available at the moment.
-          </div>
-        )}
-      </Suspense>
+      {prediction ? (
+        <HeroPredictionFrame prediction={prediction} />
+      ) : (
+        <div
+          style={{
+            backgroundColor: COLORS.cardSurface,
+            border: `3px solid ${COLORS.border}`,
+            borderRadius: "12px",
+            padding: "40px",
+            height: "280px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: COLORS.textSecondary,
+            fontSize: "13px",
+          }}
+        >
+          No upcoming predictions available at the moment.
+        </div>
+      )}
 
       {/* ------------------------------------------------------------------ */}
-      {/* Leading Indicators Analysis — Cheat Sheet per IndicatorAnalysisFullNews.md */}
+      {/* Leading Indicators Analysis — Dynamic for Active Event              */}
       {/* ------------------------------------------------------------------ */}
       <section aria-label="Leading Indicators Analysis">
         <SectionHeader
