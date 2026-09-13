@@ -7,9 +7,11 @@
 import { CalendarPageUI } from "@/pages/CalendarPageUI";
 import { fetchUpcomingEvents } from "@/lib/api/calendar";
 
+export const dynamic = "force-dynamic";
+
 async function getCalendarEvents() {
   try {
-    const data = await fetchUpcomingEvents(50); // Get more events for the full calendar page
+    const data = await fetchUpcomingEvents(100, true, "this_month");
     return data.events || [];
   } catch (error) {
     console.error("Failed to fetch calendar events:", error);
