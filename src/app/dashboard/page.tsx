@@ -40,7 +40,7 @@ export default async function DashboardPage({
   searchParams?: Promise<{ event?: string }>;
 }) {
   const resolvedParams = searchParams ? await searchParams : {};
-  const eventCode = resolvedParams?.event || "NFP";
+  const eventCode = resolvedParams?.event || undefined;
 
   const [prediction, calendarEvents] = await Promise.all([
     getPrediction(eventCode),
