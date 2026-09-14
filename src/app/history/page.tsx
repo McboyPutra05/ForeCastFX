@@ -13,7 +13,7 @@ export default async function HistoryPage() {
   try {
     const [accuracySummary, historyData] = await Promise.all([
       fetchAccuracySummary(),
-      fetchHistoricalReleases()
+      fetchHistoricalReleases(undefined, "this_month")
     ]);
     
     return <HistoryPageUI accuracySummary={accuracySummary} initialHistoryData={historyData} />;
