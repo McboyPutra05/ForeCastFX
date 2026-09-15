@@ -69,11 +69,25 @@ export default function RegisterPage() {
 
     setIsLoading(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // TODO: Replace with actual auth API call
-    window.location.href = "/auth/login";
+    try {
+      const res = await fetch(
+        (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1") + "/auth/register",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password, full_name: fullName || null }),
+        }
+      );
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.detail || "Registration failed");
+      }
+
+      window.location.href = "/auth/login";
+    } catch (err: any) {
+      setError(err.message || "Registration failed. Please try again.");
+    }
     setIsLoading(false);
   };
 
