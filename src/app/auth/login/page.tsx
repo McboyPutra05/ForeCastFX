@@ -32,14 +32,29 @@ export default function LoginPage() {
     setIsLoading(true);
     setError("");
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // TODO: Replace with actual auth API call
-    if (email && password) {
-      window.location.href = "/";
-    } else {
-      setError("Please fill in all fields");
+    try {
+      const res = await fetch(
+        (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1") + "/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        }
+      );
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.detail || "Invalid email or password");
+      }
+
+      const data = await res.json();
+      localStorage.setItem("forecastfx_token", data.access_token);
+      if (data.user) {
+        localStorage.setItem("forecastfx_user", JSON.stringify(data.user));
+      }
+      window.location.href = "/dashboard";
+    } catch (err: any) {
+      setError(err.message || "Login failed. Please try again.");
     }
     setIsLoading(false);
   };
